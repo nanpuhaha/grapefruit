@@ -62,7 +62,6 @@
 import { Component, Vue, Watch } from 'vue-property-decorator'
 import throttle from 'lodash.throttle'
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import jQuery from 'jquery'
 import colors, { StyleFunction } from 'ansi-colors'
 import GoldenLayout, { Container, ContentItem, ComponentConfig } from 'golden-layout'
 
@@ -72,7 +71,6 @@ import Console from '../components/Console.vue'
 import Frame from '../views/tabs/Frame.vue'
 
 import { Route } from 'vue-router'
-import { Terminal } from 'xterm'
 
 const SIDEBAR_WIDTH_KEY = 'sidebar-width'
 
@@ -93,7 +91,6 @@ export default class Workspace extends Vue {
     /* placeholder */
   }
 
-  term?: Terminal
   loading: State = 'connecting'
   device?: string
   bundle?: string
@@ -115,11 +112,7 @@ export default class Workspace extends Vue {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     document.querySelector('html')!.classList.add('no-scroll')
 
-    const { term } = this.$refs.console as Console
-    this.term = term
     this.resizeEvent = throttle(this.updateSize, 100)
-    this.term.writeln(colors.green('Welcome to Grapefruit!'))
-
     this.initLayout()
   }
 
@@ -191,7 +184,7 @@ export default class Workspace extends Vue {
     try {
       layout.init()
     } catch (e) {
-      this.log('warn', 'Failed to initialize. Reset GUI')
+      this.$bus.$emit('console', 'warn', 'Failed to initialize. Reset GUI')
       localStorage.clear()
       // localStorage.removeItem('layout-state')
       location.reload()
@@ -254,7 +247,7 @@ export default class Workspace extends Vue {
   created() {
     window.addEventListener('resize', this.resize)
     window.addEventListener('unhandledrejection', (ev) => {
-      this.log('error', 'unexpected error:', ev.reason)
+      this.$bus.$emit('console', 'error', 'unexpected error:', ev.reason)
     })
     window.addEventListener('keydown', this.onKeyDown)
   }
@@ -291,23 +284,6 @@ export default class Workspace extends Vue {
     }
   }
 
-  log(level: string, ...args: string[]) {
-    const { term } = this
-    if (!term) return
-
-    const color: {[key: string]: StyleFunction} = {
-      info: colors.greenBright,
-      error: colors.redBright,
-      warn: colors.yellow,
-      warning: colors.yellow
-    }
-
-    const renderer = color[level] || colors.whiteBright
-    const ts = `[${new Date().toLocaleString()}]`
-    const text = renderer([ts, ...args].join(' ').replace(/\n/g, '\r\n'))
-    term.writeln(text)
-  }
-
   changed() {
     this.loading = 'connecting'
     this.$ws
@@ -316,9 +292,6 @@ export default class Workspace extends Vue {
       })
       .on('detached', this.disconnected)
       .on('destroyed', this.disconnected)
-      .on('console', (level: string, text: string) => {
-        this.log(level, text)
-      })
   }
 
   disconnected(extra: string) {
@@ -429,7 +402,7 @@ footer.status {
   &.space-terminal {
     background: #1e1e1e;
     .xterm {
-      padding: 10px;
+      padding: 4px 10px;
     }
   }
 }
