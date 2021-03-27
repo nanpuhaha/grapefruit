@@ -9,9 +9,9 @@ import * as plist from 'plist';
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function parse(data: Buffer): any {
   const magic = data.slice(0, 6).toString().toLowerCase();
-  if (magic == '<?xml ') {
+  if (magic === '<?xml ') {
     return plist.parse(data.toString());
-  } else if (magic == 'bplist') {
+  } else if (magic === 'bplist') {
     return bplistParser.parseBuffer(data);
   }
   throw new Error(`Unknown magic "${magic}"`);
