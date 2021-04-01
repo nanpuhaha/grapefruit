@@ -62,7 +62,7 @@
 import { Component, Vue, Watch } from 'vue-property-decorator'
 import throttle from 'lodash.throttle'
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import colors, { StyleFunction } from 'ansi-colors'
+import jQuery from 'jquery'
 import GoldenLayout, { Container, ContentItem, ComponentConfig } from 'golden-layout'
 
 import MenuBar from './MenuBar.vue'
