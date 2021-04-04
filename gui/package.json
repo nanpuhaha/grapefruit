@@ -51,6 +51,7 @@
     "monaco-editor-webpack-plugin": "^1.9.1",
     "sass": "^1.32.8",
     "sass-loader": "^8.0.2",
+    "tslib": "^2.1.0",
     "typescript": "~3.7.5",
     "vue-template-compiler": "^2.6.12",
     "vuex-module-decorators": "^0.16.1"
