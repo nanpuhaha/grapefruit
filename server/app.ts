@@ -42,7 +42,10 @@ router
     const devices = await mgr.enumerateDevices()
     ctx.body = {
       version: require('frida/package.json').version,
-      list: devices.map(wrap).map(d => d.valueOf())
+      list: devices
+        .filter(dev => dev.type !== frida.DeviceType.Local && dev.name !== 'Local Socket')
+        .map(wrap)
+        .map(d => d.valueOf())
     }
   })
   .get('/device/:device/screen', async (ctx) => {
@@ -204,7 +207,7 @@ async function main(): Promise<void> {
       try {
         await fs.promises.access(abs, fs.constants.F_OK)
         await fs.promises.unlink(abs)
-      } catch(e) {
+      } catch (e) {
         ctx.status = 404
         return
       }
